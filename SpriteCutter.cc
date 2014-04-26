@@ -9,37 +9,36 @@ namespace SpriteCutter
 {
 
     static SDL_Surface* SpriteSheet = nullptr;
-    static SDL_Rect*    SpriteFrame = nullptr;
-    static SpriteList   Sprites;
-    static std::string  SpriteName;
-    static unsigned     SpriteRows = 0,SpriteCols = 0;
-    
-    int InitSpriteCutter(const std::string& Sheet,const std::string& spriteName, int spriteW, int spriteH, bool flag)
+    static SDL_Rect* SpriteFrame = nullptr;
+    static SpriteList Sprites;
+    static std::string SpriteName;
+    static unsigned SpriteRows = 0, SpriteCols = 0;
+
+    int InitSpriteCutter(const std::string& Sheet, const std::string& spriteName, int spriteW, int spriteH, bool flag)
     {
-        if(SDL_Init(SDL_INIT_VIDEO) == -1)
+        if (SDL_Init(SDL_INIT_VIDEO) == -1)
         {
-            std::cerr<<SDL_GetError();
+            std::cerr << SDL_GetError();
             return -1;
         }
-        
+
         SpriteSheet = SDL_LoadBMP(Sheet.c_str());
         if (SpriteSheet == nullptr)
         {
             std::cerr << IMG_GetError();
             return -1;
         }
-        
+
         SpriteFrame = new SDL_Rect;
         if (SpriteFrame != nullptr)
         {
             if (flag)
             {
                 SpriteFrame->w = calcWidthOfSprite(getSpriteSheet(), spriteW);
-                SpriteFrame->h = calcHeightOfSprite(getSpriteSheet(),spriteH);
+                SpriteFrame->h = calcHeightOfSprite(getSpriteSheet(), spriteH);
                 SpriteFrame->x = 0;
                 SpriteFrame->y = 0;
-            }
-            else
+            } else
             {
                 SpriteFrame->w = spriteW;
                 SpriteFrame->h = spriteH;
@@ -57,26 +56,30 @@ namespace SpriteCutter
 
         setColsOfSheet(
                 calcColsOfSheet(getSpriteSheet(), spriteH));
-        
+
         setSpriteName(spriteName);
     }
-    
+
     void QuitSpriteCutter()
     {
-        if(getSpriteSheet() != nullptr)
+        if (getSpriteSheet() != nullptr)
             SDL_FreeSurface(getSpriteSheet());
         delete SpriteFrame;
-        
-        for(auto i = Sprites.begin(); i != Sprites.end(); i++)
+
+        for (auto i = Sprites.begin(); i != Sprites.end(); i++)
         {
             SDL_FreeSurface((*i));
         }
-        
+
         atexit(SDL_Quit);
     }
 
     SDL_Surface* CutSprite(SDL_Surface* source, SDL_Surface* destination, const SDL_Rect* frame)
     {
+        std::cerr<<"Frame used to cut:  ["
+                    <<frame->w<<";"
+                    <<frame->h<<"] || ("
+                    <<frame->x<<"|"<<frame->y<<")\n";
         SDL_BlitSurface(source, frame, destination, nullptr);
         return destination;
     }
@@ -91,6 +94,11 @@ namespace SpriteCutter
         return CutSprite(source, destination, frame);
     }
 
+    SDL_Surface* NewSprite()
+    {
+        return SDL_CreateRGBSurface(0, getWidthOfSprite(), getHeightOfSprite(), 32, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    }
+
     SDL_Surface* CopySurface(SDL_Surface* source)
     {
         return SDL_CreateRGBSurfaceFrom(source->pixels, source->w, source->h, 32, source->pitch,
@@ -99,35 +107,46 @@ namespace SpriteCutter
 
     void SaveSpriteList(SpriteList Sprites)
     {
-        for (int i = 0; i < getSizeOfSheet()-1; ++i)
+        int j = 0;
+        for (auto i = Sprites.begin(); i < Sprites.end(); i++,j++)
         {
-            std::string name = getSpriteName()+"_" + ToString(i) + ".bmp";
-            SDL_SaveBMP(Sprites[i], name.c_str());
+            std::string name = getSpriteName() + "_" + ToString(j) + ".bmp";
+            if( (*i) != nullptr)
+                SDL_SaveBMP((*i), name.c_str());
         }
     }
 
-    SpriteList CreateSpriteList(SDL_Surface*)
+    SpriteList CreateSpriteList(SDL_Surface* Sheet)
     {
-//        SpriteList Sprites;
-//        Sprites.reserve(24);
-
-        SDL_Rect SpriteFrame;
-        SpriteFrame.w = getWidthOfSprite();
-        SpriteFrame.h = getHeightOfSprite();
-
         for (int y = 0; y < 4; y++)
         {
             for (int x = 0; x < 6; x++)
-            {
-                SDL_Surface* Destination = SDL_CreateRGBSurface(0, getWidthOfSprite(), getHeightOfSprite(), 32, 0, 0, 0, SDL_ALPHA_OPAQUE);
-                SpriteFrame.x = x * getWidthOfSprite();
-                SpriteFrame.y = y * getHeightOfSprite();
-                Sprites.push_back(CutSprite(getSpriteSheet(), Destination, &SpriteFrame));
+            {            
+                if (Sheet != nullptr)
+                    Sprites.push_back(CutSprite(Sheet, NewSprite(), calcSpriteFramePosition(getSpriteFrame(),x,y)));
+                else
+                    Sprites.push_back(CutSprite(getSpriteSheet(), NewSprite(), calcSpriteFramePosition(getSpriteFrame(),x,y)));
             }
         }
-
-//        Sprites.shrink_to_fit();
         return Sprites;
+    }
+    
+    SDL_Rect*calcSpriteFramePosition(SDL_Rect* Frame, int x, int y)
+    {
+        Frame->x = x * getWidthOfSprite();
+        Frame->y = y * getHeightOfSprite();
+        if(Frame->x > getSpriteSheet()->w || Frame->y > getSpriteSheet()->h)
+        {
+            std::cerr<<"Error SpriteFrame position out of border[x max = "
+                    <<getSpriteSheet()->w<<"; y max = "
+                    <<getSpriteSheet()->h<<"] ("
+                    <<Frame->x<<"|"<<Frame->y<<")\n";
+            return nullptr;
+        }
+        else
+        {
+            return Frame;
+        }
     }
 
     unsigned calcColsOfSheet(SDL_Surface* Sheet, unsigned SpriteWidth)
@@ -182,9 +201,12 @@ namespace SpriteCutter
 
     SDL_Surface* getSpriteSheet()
     {
-        return SpriteSheet;
+        if (SpriteSheet != nullptr)
+            return SpriteSheet;
+        else
+            throw;
     }
-    
+
     std::string getSpriteName()
     {
         return SpriteName;
@@ -220,7 +242,7 @@ namespace SpriteCutter
         SpriteFrame->w = w;
         SpriteFrame->h = h;
     }
-    
+
     void setSpriteName(const std::string& name)
     {
         SpriteName = name;
