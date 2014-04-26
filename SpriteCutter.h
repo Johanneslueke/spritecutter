@@ -56,12 +56,14 @@ namespace SpriteCutter
     
     SDL_Surface* CutSprite(SDL_Surface* source, SDL_Surface* destination, const SDL_Rect*);
     SDL_Surface* CutSprite(SDL_Surface* source, SDL_Surface* destination, int w, int h, int x, int y);
+    SDL_Surface* NewSprite();
     SDL_Surface* CopySurface(SDL_Surface*);
 
     unsigned calcRowsOfSheet(SDL_Surface*, unsigned SpriteWidth);
     unsigned calcColsOfSheet(SDL_Surface*, unsigned SpriteHeight);
     unsigned calcWidthOfSprite(SDL_Surface*, unsigned Cols);
     unsigned calcHeightOfSprite(SDL_Surface*, unsigned Rows);
+    SDL_Rect*calcSpriteFramePosition(SDL_Rect*,int x, int y);
     
     unsigned getRowsOfSheet();
     unsigned getColsOfSheet();
@@ -85,4 +87,3 @@ namespace SpriteCutter
 }
 
 #endif	/* SPRITECUTTER_H */
-
