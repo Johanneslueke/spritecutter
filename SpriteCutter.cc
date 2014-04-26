@@ -10,6 +10,7 @@ namespace SpriteCutter
 
     static SDL_Surface* SpriteSheet = nullptr;
     static SDL_Rect*    SpriteFrame = nullptr;
+    static SpriteList   Sprites;
     static std::string  SpriteName;
     static unsigned     SpriteRows = 0,SpriteCols = 0;
     
@@ -66,6 +67,11 @@ namespace SpriteCutter
             SDL_FreeSurface(getSpriteSheet());
         delete SpriteFrame;
         
+        for(auto i = Sprites.begin(); i != Sprites.end(); i++)
+        {
+            SDL_FreeSurface((*i));
+        }
+        
         atexit(SDL_Quit);
     }
 
@@ -102,7 +108,7 @@ namespace SpriteCutter
 
     SpriteList CreateSpriteList(SDL_Surface*)
     {
-        SpriteList Sprites;
+//        SpriteList Sprites;
 //        Sprites.reserve(24);
 
         SDL_Rect SpriteFrame;
