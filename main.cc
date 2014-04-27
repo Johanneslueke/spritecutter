@@ -34,7 +34,7 @@ int main(int argc, char** argv)
     };
     
     /***************************************************************************/
-    if(InitSpriteCutter(Flags[1].c_str(), Flags[2].c_str(), atoi(Flags[3].c_str()), atoi(Flags[4].c_str()),Test(Flags[5])) == -1)
+    if(InitSpriteCutter(Flags[1], Flags[2], atoi(Flags[3].c_str()), atoi(Flags[4].c_str()),Test(Flags[5])) == -1)
     {
         exit(-1);
     }
