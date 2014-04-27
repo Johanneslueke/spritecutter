@@ -52,10 +52,10 @@ namespace SpriteCutter
         }
 
         setRowsOfSheet(
-                calcRowsOfSheet( getSpriteSheet(), spriteW ));
+                calcRowsOfSheet( getSpriteSheet(), spriteH ));
 
         setColsOfSheet(
-                calcColsOfSheet( getSpriteSheet(), spriteH ));
+                calcColsOfSheet( getSpriteSheet(), spriteW  ));
 
         setSpriteName( spriteName );
     }
@@ -118,9 +118,9 @@ namespace SpriteCutter
 
     SpriteList CreateSpriteList(SDL_Surface* Sheet)
     {
-        for (int y = 0; y < 4; y++)
+        for (int y = 0; y < getRowsOfSprite(); y++)
         {
-            for (int x = 0; x < 6; x++)
+            for (int x = 0; x < getColsOfSprite(); x++)
             {            
                 if (Sheet != nullptr)
                     Sprites.push_back( CutSprite( Sheet, NewSprite(), calcSpriteFramePosition( getSpriteFrame(),x,y ) ));
