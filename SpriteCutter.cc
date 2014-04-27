@@ -34,8 +34,8 @@ namespace SpriteCutter
         {
             if (flag)
             {
-                SpriteFrame->w = calcWidthOfSprite(getSpriteSheet(), spriteW);
-                SpriteFrame->h = calcHeightOfSprite(getSpriteSheet(), spriteH);
+                SpriteFrame->w = calcWidthOfSprite( getSpriteSheet(), spriteW );
+                SpriteFrame->h = calcHeightOfSprite( getSpriteSheet(), spriteH );
                 SpriteFrame->x = 0;
                 SpriteFrame->y = 0;
             } else
@@ -52,23 +52,23 @@ namespace SpriteCutter
         }
 
         setRowsOfSheet(
-                calcRowsOfSheet(getSpriteSheet(), spriteW));
+                calcRowsOfSheet( getSpriteSheet(), spriteW ));
 
         setColsOfSheet(
-                calcColsOfSheet(getSpriteSheet(), spriteH));
+                calcColsOfSheet( getSpriteSheet(), spriteH ));
 
-        setSpriteName(spriteName);
+        setSpriteName( spriteName );
     }
 
     void QuitSpriteCutter()
     {
         if (getSpriteSheet() != nullptr)
-            SDL_FreeSurface(getSpriteSheet());
+            SDL_FreeSurface( getSpriteSheet() );
         delete SpriteFrame;
 
         for (auto i = Sprites.begin(); i != Sprites.end(); i++)
         {
-            SDL_FreeSurface((*i));
+            SDL_FreeSurface( (*i) );
         }
 
         atexit(SDL_Quit);
@@ -123,9 +123,9 @@ namespace SpriteCutter
             for (int x = 0; x < 6; x++)
             {            
                 if (Sheet != nullptr)
-                    Sprites.push_back(CutSprite(Sheet, NewSprite(), calcSpriteFramePosition(getSpriteFrame(),x,y)));
+                    Sprites.push_back( CutSprite( Sheet, NewSprite(), calcSpriteFramePosition( getSpriteFrame(),x,y ) ));
                 else
-                    Sprites.push_back(CutSprite(getSpriteSheet(), NewSprite(), calcSpriteFramePosition(getSpriteFrame(),x,y)));
+                    Sprites.push_back( CutSprite( getSpriteSheet(), NewSprite(), calcSpriteFramePosition( getSpriteFrame(),x,y ) ));
             }
         }
         return Sprites;
